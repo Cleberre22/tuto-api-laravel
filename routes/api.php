@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ClubController;
 use App\Http\Controllers\API\PlayerController;
+use App\Http\Controllers\API\ImageUploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,3 +25,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::apiResource("players", PlayerController::class);
 
 Route::apiResource("clubs", ClubController::class);
+
+Route::post('uploading-image-api', [ImageUploadController::class, 'upload']);
