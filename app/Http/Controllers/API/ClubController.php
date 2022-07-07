@@ -49,24 +49,20 @@ class ClubController extends Controller
 
         $request->validate([
             'name' => 'required|max:100',
-            'sport_id' => 'required',
         ]);
 
         // On crée un nouveau club
         $club = Club::create([
             'name' => $request->name,
-            'sport_id' => $request->sport_id,
         ]);
 
         //Comment remplir une table pivot de façon bien dégueulasse
 
         //Je récupère mes catégories dans le formulaire
-        $sport = $request->sports;
-        //Je les mets dans un tableau
-        $sportsid = explode(",", $sport);
-        //Et le boucle pour les rentrer dans la base de données
-        for ($i = 0; $i < count($sportsid); $i++) {
-            $sport = Sport::find($sportsid[$i]);
+
+        $sports = $request->sport_id;
+        for ($i = 0; $i < count($sports); $i++) {
+            $sport = Sport::find($sports[$i]);
             $club->sport()->attach($sport);
         }
 
