@@ -13,11 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('images', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('path');
-            $table->timestamps();
+        Schema::table('clubs', function (Blueprint $table) {
+            $table->bigInteger('sport_id')->unsigned(); 
+            $table->foreign('sport_id')
+                ->references('id')
+                ->on('sports');
         });
     }
 
@@ -28,6 +28,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('images');
+        Schema::table('clubs', function (Blueprint $table) {
+            //
+        });
     }
 };

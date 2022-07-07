@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\Player;
 use App\Models\Club;
+use App\Models\Sport;
+use App\Models\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -22,10 +23,18 @@ class ClubController extends Controller
             ->get()
             ->toArray();
 
+        // On récupère tous les sports
+        $sports = DB::table('sports')
+            ->join('clubs', 'sports.club_id', '=', 'clubs.id')
+            ->select('sports.*', 'clubs.name')
+            ->get()
+            ->toArray();
+
         // On retourne les informations des utilisateurs en JSON
         return response()->json([
             'status' => 'Success',
             'data' => $clubs,
+            'data' => $sports,
         ]);
     }
 
@@ -40,18 +49,32 @@ class ClubController extends Controller
 
         $request->validate([
             'name' => 'required|max:100',
+            'sport_id' => 'required',
         ]);
 
         // On crée un nouveau club
         $club = Club::create([
             'name' => $request->name,
+            'sport_id' => $request->sport_id,
         ]);
+
+        //Comment remplir une table pivot de façon bien dégueulasse
+
+        //Je récupère mes catégories dans le formulaire
+        $sport = $request->sports;
+        //Je les mets dans un tableau
+        $sportsid = explode(",", $sport);
+        //Et le boucle pour les rentrer dans la base de données
+        for ($i = 0; $i < count($sportsid); $i++) {
+            $sport = Sport::find($sportsid[$i]);
+            $club->sport()->attach($sport);
+        }
 
         // On retourne les informations du nouveau club en JSON
         return response()->json([
             'status' => 'Success',
             'data' => $club,
-          ]);
+        ]);
     }
 
     /**

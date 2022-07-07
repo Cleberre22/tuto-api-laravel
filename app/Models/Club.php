@@ -8,10 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Club extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'image', 'club_id'];
+    protected $fillable = ['name', 'sport_id'];
 
 
     public function players(){
         return $this->belongsToMany('App\Player');
+    }
+
+    public function sports(){
+        return $this->belongsToMany('App\Sport');
     }
 }

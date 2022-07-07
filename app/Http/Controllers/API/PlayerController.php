@@ -21,14 +21,14 @@ class PlayerController extends Controller
         $players = DB::table('players')
             ->get()
             ->toArray();
-        
+
         // On récupère tous les clubs
         $clubs = DB::table('clubs')
-                ->join('players', 'clubs.player_id', '=', 'players.id')
-                ->select('clubs.*', 'players.name')
-                ->get()
-                ->toArray();
-      
+            ->join('players', 'clubs.player_id', '=', 'players.id')
+            ->select('clubs.*', 'players.name')
+            ->get()
+            ->toArray();
+
         // On retourne les informations des utilisateurs en JSON
         return response()->json([
             'status' => 'Success',
@@ -55,6 +55,21 @@ class PlayerController extends Controller
             'club_id' => 'required',
         ]);
 
+        $filename = "";
+        if ($request->hasFile('photoPlayer')) {
+            // On récupère le nom du fichier avec son extension, résultat $filenameWithExt : "jeanmiche.jpg"
+            $filenameWithExt = $request->file('photoPlayer')->getClientOriginalName();
+            $filenameWithoutExt = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            // On récupère l'extension du fichier, résultat $extension : ".jpg"
+            $extension = $request->file('photoPlayer')->getClientOriginalExtension();
+            // On créer un nouveau fichier avec le nom + une date + l'extension, résultat $fileNameToStore :"jeanmiche_20220422.jpg"
+            $filename = $filenameWithoutExt . '_' . time() . '.' . $extension;
+            // On enregistre le fichier à la racine /storage/app/public/uploads, ici la méthode storeAs défini déjà le chemin /storage/app
+            $path = $request->file('photoPlayer')->storeAs('public/uploads', $filename);
+        } else {
+            $filename = Null;
+        }
+
         // On crée un nouveau joueur
         $player = Player::create([
             'firstName' => $request->firstName,
@@ -62,6 +77,7 @@ class PlayerController extends Controller
             'height' => $request->height,
             'position' => $request->position,
             'club_id' => $request->club_id,
+            'photoPlayer' =>$filename,
         ]);
 
         // On retourne les informations du nouvel utilisateur en JSON
@@ -69,7 +85,7 @@ class PlayerController extends Controller
             'status' => 'Success',
             'data' => $player,
             'data' => $clubs,
-          ]);
+        ]);
     }
 
     /**
